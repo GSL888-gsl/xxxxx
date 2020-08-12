@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="isoft.dao.UserDao">
+    <resultMap id="NewsMap" type="User">
+        <id column="id" property="id" />
+        <result column="name" property="name" />
+        <result column="password" property="password" />
+        <result column="regDatetime" property="regDatetime" />
+        <result column="status" property="status" />
+        <result column="photoUrl" property="photoUrl" />
+        <collection  property="comment" ofType="comment">
+            <id column="id" property="id" />
+            <result property="newsid" column="newsid" />
+            <result property="userid" column="userid" />
+            <result property="content" column="content" />
+            <result property="addDatetime" column="addDatetime" />
+        </collection >
+    </resultMap>
+        <select id="login" resultType="User">
+            select * from tb_users where name=#{name} and password=#{password}
+        </select>
+
+
+         <select id="getById" resultType="User">
+            select * from tb_users where id=#{id}
+        </select>
+
+    <update id="updateById" parameterType="User">
+        update  tb_users
+        <set>
+            <if test="null!=password">
+                password=#{password},
+            </if>
+            <if test="null!=status">
+                status=#{status},
+            </if>
+            <if test="null!=photoUrl">
+                photoUrl=#{photoUrl},
+            </if>
+        </set>
+        where id=#{id}
+
+    </update>
+
+    <select id="getUser" resultType="User">
+        select * from tb_news
+        <where>
+            <if test="null!=name">
+                and name=#{name}
+            </if>
+            <if test="null!=status">
+                and status=#{status}
+            </if>
+        </where>
+    </select>
+
+
+    <insert id="insert" parameterType="User">
+         insert into tb_users
+         values (null,#{name},#{password},now(),#{status},#{photoUrl});
+    </insert>
+
+    <select id="get" resultMap="NewsMap">
+        SELECT  tb_users.*,tb_comment.content,tb_comment.addDatetime
+         from tb_comment inner join tb_users on tb_users.id=tb_comment.userid
+        where tb_users.id=#{id}
+    </select>
+</mapper>
